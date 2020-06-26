@@ -7,24 +7,27 @@ var cameraDepth;
 var img;
 var canvas;
 
-var grassEven;
-var grassOdd;
-var rumbleEven;
-var rumbleOdd;
-var roadEven;
-var roadOdd;
+var grassEvenColor;
+var grassOddColor;
+var rumbleEvenColor;
+var rumbleOddColor;
+var roadEvenColor;
+var roadOddColor;
 
 var currentPosition;
 var startPos;
 var playerX;
-var speed;
+var playerSpeed;
 var maxSpeed = 3;
 var minSpeed = 0;
+var speedArray = [0, 1, 3, 5];
 
 var lines = [];
 
 var count = 0;
 var imgTemp;
+
+var debug = false;
 
 class Line {
 	constructor() {
@@ -47,74 +50,62 @@ class Line {
 	}
 
 	project(camX, camY, camZ) {
-		this.scale = cameraDepth/(this.z-camZ);
-    	this.X = (1 + this.scale *(this.x - camX)) * width/2;
-    	this.Y = (1 - this.scale * (this.y - camY)) * height/2;
-    	this.W = this.scale * roadWidth  * width/2;
-  	}			
-			
-  	drawSprite(correction) {
-  		if (this.sprite != null) {
-			var s = this.sprite;
-			
+		this.scale = cameraDepth / (this.z - camZ);
+		this.X = (1 + this.scale * (this.x - camX)) * width / 2;
+		this.Y = (1 - this.scale * (this.y - camY)) * height / 2;
+		this.W = this.scale * roadWidth * width / 2;
+	}
+
+	drawSprite(correction) {
+		if (this.sprite != null) {
+			var sprite = this.sprite;
+
 			var w = this.originalSpriteWidth;
 			var h = this.originalSpriteHeight;
-			// console.log(w +' -- '+h);
-			// console.log(' '+this.X +' '+ this.scale +' '+ this.spriteX +' '+ width);
-			var destX = this.X + this.scale * this.spriteX * width/2;
-			
-			var destY = this.Y;
-			var destW  = w * this.W / 266;
-			var destH  = h * this.W / 266;
-			
-			// console.log('destW: '+ destW + ' destH: '+ destH +' -- W: '+ this.W +'   destX: '+destX +' destY:'+ destY );
-			// destX += destW * this.spriteX + playerX*roadWidth - correction ; //offsetX
-			destY -= (destH/5);
-			// destY += destH * (-1);    //offsetY
-			destX = (this.X - this.W) + (this.scale*this.spriteX);
-			// console.log('** destX: '+destX +' destY:'+ destY );
 
-			var clipH = destY+destH-this.clip;
-			if (clipH<0) {
-				clipH=0;
+			var destX = this.X + this.scale * this.spriteX * width / 2;
+
+			var destY = this.Y;
+			var destW = w * this.W / 266;
+			var destH = h * this.W / 266;
+
+			destY -= (destH / 5);
+			destX = (this.X - this.W) + (this.scale * this.spriteX);
+			// destX += destW * this.spriteX + playerX*roadWidth - correction ; //offsetX
+
+			var clipH = destY + destH - this.clip;
+			if (clipH < 0) {
+				clipH = 0;
 			}
-				
-			if (clipH>=destH) {
-				s.hide();
-			} else {    	
-				// s.setTextureRect(IntRect(0,0,this.w,this.h-this.h*clipH/destH));
-				// s.size(destW/w,destH/h);
-				s.size(50,50);
-				s.position(destX, destY);
-				s.show();
+
+			if (clipH >= destH) {
+				sprite.hide();
+			} else {
+				// sprite.setTextureRect(IntRect(0,0,this.w,this.h-this.h*clipH/destH));
+				// sprite.size(destW/w,destH/h);
+				sprite.size(25, 25);
+				sprite.position(destX, destY);
+				sprite.show();
 			}
-    	}
-    }
+		}
+	}
 };
 
-//draw a rectangle line
-function drawQuad(color, x1, y1, w1, x2, y2, w2) {
-	fill(color);
-	strokeWeight(0);
-	//console.log(x1-w1+'-'+y1+'-'+x2-w2+'-'+y2+'-'+x2+w2+'-'+y2+'-'+x1+w1+'-'+y1);
-  	quad(x1-w1,y1,x2-w2,y2,x2+w2,y2,x1+w1,y1); 	
-}
-
 function preload() {
-//   img = loadImage('img/bg.png');
+	//   img = loadImage('img/bg.png');
 }
 
 function createHiddenImage(path, lineNumber) {
 	var newImg = createImg(path);
 	//newImg.show();
-	console.log(newImg.width +' *** '+ newImg.height);
-// 	l.originalSpriteWidth=newImg.width;
-// 	l.originalSpriteHeight=newImg.height;
-	lineNumber.originalSpriteWidth=1024;
-	lineNumber.originalSpriteHeight=372;	
-	
+	console.log(newImg.width + ' *** ' + newImg.height);
+	// 	l.originalSpriteWidth=newImg.width;
+	// 	l.originalSpriteHeight=newImg.height;
+	lineNumber.originalSpriteWidth = 1024;
+	lineNumber.originalSpriteHeight = 372;
+
 	newImg.hide();
-	lineNumber.sprite=newImg;
+	lineNumber.sprite = newImg;
 	count++;
 	return newImg;
 }
@@ -125,39 +116,39 @@ function setup() {
 	cameraDepth = 0.84;
 	width = 1024;
 	height = 700;
-	
-	grassEven  = color(16, 200, 16);
-	grassOdd  = color(0,154,0);
-	rumbleEven = color(255, 255, 255);
-	rumbleOdd = color(150,0,30);
-	roadEven   = color(107, 107, 107);
-	roadOdd   = color(105,105,105);
-	
+
+	grassEvenColor = color(16, 200, 16);
+	grassOddColor = color(0, 154, 0);
+	rumbleEvenColor = color(255, 255, 255);
+	rumbleOddColor = color(150, 0, 30);
+	roadEvenColor = color(107, 107, 107);
+	roadOddColor = color(105, 105, 105);
+
 	canvas = createCanvas(width, height);
-	canvas.position(0,0);
-	
-	speed = 0;
+	canvas.position(0, 0);
+
+	playerSpeed = 0;
 	currentPosition = 0;
-// 	currentPosition = 204000;
+	// 	currentPosition = 204000;
 	playerX = 0;
 	curve = 0;
-	
- 	img = createImg("img/bg.png");
-	img.position(0,0);
-	img.size(width, 372);	
-	
+
+	img = createImg("img/bg.png");
+	img.position(0, 0);
+	img.size(width, 372);
+
 	// sprite5 = createHiddenImage("img/5.png");
- 	// sprite6 = createHiddenImage("img/6.png");
- 	// sprite4 = createHiddenImage("img/4.png");
- 	// sprite1 = createHiddenImage("img/1.png");
- 	// sprite7 = createHiddenImage("img/7.png");
+	// sprite6 = createHiddenImage("img/6.png");
+	// sprite4 = createHiddenImage("img/4.png");
+	// sprite1 = createHiddenImage("img/1.png");
+	// sprite7 = createHiddenImage("img/7.png");
 
-	for(i=0;i<1600;i++) {
+	for (i = 0; i < 1600; i++) {
 		line = new Line();
-		line.z = i*segmentLength;
+		line.z = i * segmentLength;
 
-		if (i>300 && i<700) line.curve=0.5;
-		if (i>1100 && i<1400) line.curve=-0.7;
+		if (i > 300 && i < 700) line.curve = 0.5;
+		if (i > 1100 && i < 1400) line.curve = -0.7;
 
 		// if (i<300 && i%20==0) {line.spriteX=-2.5; line.sprite=sprite5;}
 		// if (i%17==0)          {line.spriteX=2.0; line.sprite=sprite6;}
@@ -171,120 +162,143 @@ function setup() {
 		// if (i>800 && i%20==0) {line.spriteX=-1.2; line.sprite=createHiddenImage("img/1.png")}
 		// if (i==400)           {line.spriteX=-1.2; line.sprite=createHiddenImage("img/7.png")}
 
-		if (i<300 && i%20==0) {
-			line.spriteX=-2.5;
+		if (i < 300 && i % 20 == 0) {
+			line.spriteX = -2.5;
 		}
-		if (i%17==0 ) {
+		if (i % 17 == 0) {
 			line.spriteX = 2.0;
 		}
-		if (i>300 && i%20==0) {
-			line.spriteX=-0.7;
+		if (i > 300 && i % 20 == 0) {
+			line.spriteX = -0.7;
 		}
-		if (i>800 && i%20==0) {
-			line.spriteX=-1.2;
+		if (i > 800 && i % 20 == 0) {
+			line.spriteX = -1.2;
 		}
-		if (i==400) {
-			line.spriteX=-1.2;
+		if (i == 400) {
+			line.spriteX = -1.2;
 		}
-		if (i>750 & i<1410) {
+		if (i > 750 & i < 1410) {
 			line.y = sin(i / 30.0) * 1500;
 		}
-       
+
 		lines.push(line);
 	}
-	
+
 	// Temp to evaluate the behaviour ouf the sprites
-    imgTemp = createHiddenImage("img/7.png", lines[300]);
+	imgTemp = createHiddenImage("img/7.png", lines[300]);
 	lines[300].spriteX = -1.2
 
-    frameRate(20);
-    // noLoop();
+	if (debug) {
+		noLoop();
+	} else {
+		frameRate(20);
+	}
 }
 
-function draw() { 
+function draw() {
 	maxy = height;
-  	N = lines.length;
-  	x = 0;
-  	dx = 0;
-  	H = 1500;
-  	
-	if (currentPosition/segmentLength > H) {
-		console.log('Max pos = '+currentPosition);
-		currentPosition=0;
-	}
-	
-	currentPosition += (speed * segmentLength);
-	startPos = currentPosition/segmentLength;
+	N = lines.length;
+	x = 0;
+	dx = 0;
+	H = 1500;
 
-  	camH = lines[startPos].y + H;
+	if (currentPosition / segmentLength > H) {
+		console.log('Max pos = ' + currentPosition);
+		currentPosition = 0;
+	}
 
-  	if (keyIsDown(LEFT_ARROW)) {
-		playerX -= 1;
-	}
-	if (keyIsDown(RIGHT_ARROW)) {
-    	playerX += 1;
-  	}
-	if (keyIsDown(UP_ARROW)) {
-		currentPosition += segmentLength;
-		// speed += 1;
-		// if (speed >= maxSpeed) {
-		// 	speed = maxSpeed;
-		// }
-  	}
-	if (keyIsDown(DOWN_ARROW)) {
-		currentPosition -= segmentLength;
-		// speed -= 1;
-		// if (speed <= minSpeed) {
-		// 	speed = minSpeed;
-		// }
-	}
+	currentPosition += (speedArray[playerSpeed] * segmentLength);
+	startPos = currentPosition / segmentLength;
+
+	camH = lines[startPos].y + H;
+
+	moveKeyIsDown();
 
 	clear();
 
-	for (n=startPos+1; n<startPos+300; n++) {
-		l = lines[n%N];
-     	l.project(playerX*roadWidth/5-x, camH, (startPos*segmentLength - (n>=N?N*segmentLength:0)));
-//      	console.log(' aa '+ playerX*(roadWidth/5)-x +'-'+ camH +' - '+ (startPos*segmentLength - (n>=N?N*segmentLength:0)));
-     	x += dx;
-    	dx += l.curve;
+	for (n = startPos + 1; n < startPos + 300; n++) {
+		currentLine = lines[n % N];
+		currentLine.project(playerX * roadWidth / 5 - x, camH, (startPos * segmentLength - (n >= N ? N * segmentLength : 0)));
 
-		l.clip = maxy;
-    	if (l.Y >= maxy) { 
-    		//alert('maxy');
-    		//console.log('maxy ='+ maxy);
-		} else {
-    		maxy = l.Y;
-		
-			grass  = n%2 ? grassEven:grassOdd;
-			rumble = n%2 ? rumbleEven:rumbleOdd;
-			road   = n%2 ? roadEven:roadOdd;
+		x += dx;
+		dx += currentLine.curve;
 
-			p = lines[n-1%N];
-					
-			if (p != null) {
-				drawQuad(grass,    0, p.Y, width,    0,   l.Y, width);
-				drawQuad(rumble, p.X, p.Y, p.W*1.18,  l.X, l.Y, l.W*1.18);
-				drawQuad(road,   p.X, p.Y, p.W,      l.X, l.Y, l.W);
-				// console.log('road   '+ round(p.X) +'-'+ round(p.Y)+'-'+ round(p.W)+'    -    '+ round(l.X)+'-'+ round(l.Y)+'-'+ (l.W))
+		currentLine.clip = maxy;
+		if (currentLine.Y <= maxy) {
+			maxy = currentLine.Y;
+
+			grassColor = n % 2 ? grassEvenColor : grassOddColor;
+			rumbleColor = n % 2 ? rumbleEvenColor : rumbleOddColor;
+			roadColor = n % 2 ? roadEvenColor : roadOddColor;
+
+			previousLine = lines[n - 1 % N];
+
+			if (previousLine != null) {
+				drawQuad(grassColor, 0, previousLine.Y, width, 0, currentLine.Y, width);
+				drawQuad(rumbleColor, previousLine.X, previousLine.Y, previousLine.W * 1.18, currentLine.X, currentLine.Y, currentLine.W * 1.18);
+				drawQuad(roadColor, previousLine.X, previousLine.Y, previousLine.W, currentLine.X, currentLine.Y, currentLine.W);
 			}
 
-			l.drawSprite(x);
-		}	
+			currentLine.drawSprite(x);
+		}
 	}
-
-	// currentPosition += speed;
+	drawTextWithBorder(rumbleEvenColor, rumbleOddColor, "Speed: "+ speedArray[playerSpeed]*10, 0, 410);
 }
 
-// function keyPressed() {
-// 	// alert('pressed');
-// 	if (keyCode == LEFT_ARROW) {
-//     	playerX -= 1;
-//   	} else if (keyCode == RIGHT_ARROW) {
-//     	playerX += 1;
-//   	} else if (keyCode == UP_ARROW) {
-// 		currentPosition += 200;
-// 	} else if (keyCode == DOWN_ARROW) {
-// 		currentPosition -= 200;
-// 	}
-// 	redraw();
-// }
+function brake() {
+	playerSpeed -= 1;
+	if (playerSpeed <= minSpeed) {
+		playerSpeed = minSpeed;
+	}
+}
+
+function acelerate() {
+	playerSpeed += 1;
+	if (playerSpeed >= maxSpeed) {
+		playerSpeed = maxSpeed;
+	}
+}
+
+function moveRight() {
+	playerX += 1;
+}
+
+function moveLeft() {
+	playerX -= 1;
+}
+
+//Used when running normally (not debug)
+function moveKeyIsDown() {
+	if (debug) {
+		return;
+	}
+	if (keyIsDown(LEFT_ARROW)) {
+		moveLeft();
+	}
+	if (keyIsDown(RIGHT_ARROW)) {
+		moveRight();
+	}
+	if (keyIsDown(UP_ARROW)) {
+		acelerate();
+	}
+	if (keyIsDown(DOWN_ARROW)) {
+		brake();
+	}
+}
+
+//Used when doing debug
+function keyPressed() {
+	if (!debug) {
+		return;
+	}
+	if (keyCode == LEFT_ARROW) {
+    	moveLeft();
+  	} else if (keyCode == RIGHT_ARROW) {
+    	moveRight();
+  	} else if (keyCode == UP_ARROW) {
+		acelerate();
+	} else if (keyCode == DOWN_ARROW) {
+		brake();
+	}
+	redraw();
+}
