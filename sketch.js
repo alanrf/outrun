@@ -24,7 +24,6 @@ var speedArray = [0, 1, 3, 5];
 
 var lines = [];
 
-var count = 0;
 var imgTemp;
 
 var debug = false;
@@ -92,22 +91,7 @@ class Line {
 };
 
 function preload() {
-	//   img = loadImage('img/bg.png');
-}
-
-function createHiddenImage(path, lineNumber) {
-	var newImg = createImg(path);
-	//newImg.show();
-	console.log(newImg.width + ' *** ' + newImg.height);
-	// 	l.originalSpriteWidth=newImg.width;
-	// 	l.originalSpriteHeight=newImg.height;
-	lineNumber.originalSpriteWidth = 1024;
-	lineNumber.originalSpriteHeight = 372;
-
-	newImg.hide();
-	lineNumber.sprite = newImg;
-	count++;
-	return newImg;
+	// img = loadImage('img/bg/bg.png');
 }
 
 function setup() {
@@ -133,15 +117,16 @@ function setup() {
 	playerX = 0;
 	curve = 0;
 
-	img = createImg("img/bg.png");
+	img = createImg("img/bg/bg.png");
 	img.position(0, 0);
 	img.size(width, 372);
+	img.show();
 
-	// sprite5 = createHiddenImage("img/5.png");
-	// sprite6 = createHiddenImage("img/6.png");
-	// sprite4 = createHiddenImage("img/4.png");
-	// sprite1 = createHiddenImage("img/1.png");
-	// sprite7 = createHiddenImage("img/7.png");
+	// sprite5 = createHiddenImage("img/sprites/5.png");
+	// sprite6 = createHiddenImage("img/sprites/6.png");
+	// sprite4 = createHiddenImage("img/sprites/4.png");
+	// sprite1 = createHiddenImage("img/sprites/1.png");
+	// sprite7 = createHiddenImage("img/sprites/7.png");
 
 	for (i = 0; i < 1600; i++) {
 		line = new Line();
@@ -156,11 +141,11 @@ function setup() {
 		// if (i>800 && i%20==0) {line.spriteX=-1.2; line.sprite=sprite1;}
 		// if (i==400)           {line.spriteX=-1.2; line.sprite=sprite7;}
 
-		// if (i<300 && i%20==0) {line.spriteX=-2.5; line.sprite=createHiddenImage("img/5.png");}
-		// if (i%17==0)          {line.spriteX=2.0; line.sprite=createHiddenImage("img/6.png");}
-		// if (i>300 && i%20==0) {line.spriteX=-0.7; line.sprite=createHiddenImage("img/4.png")}
-		// if (i>800 && i%20==0) {line.spriteX=-1.2; line.sprite=createHiddenImage("img/1.png")}
-		// if (i==400)           {line.spriteX=-1.2; line.sprite=createHiddenImage("img/7.png")}
+		// if (i<300 && i%20==0) {line.spriteX=-2.5; line.sprite=createHiddenImage("img/sprites/5.png");}
+		// if (i%17==0)          {line.spriteX=2.0; line.sprite=createHiddenImage("img/sprites/6.png");}
+		// if (i>300 && i%20==0) {line.spriteX=-0.7; line.sprite=createHiddenImage("img/sprites/4.png")}
+		// if (i>800 && i%20==0) {line.spriteX=-1.2; line.sprite=createHiddenImage("img/sprites/1.png")}
+		// if (i==400)           {line.spriteX=-1.2; line.sprite=createHiddenImage("img/sprites/7.png")}
 
 		if (i < 300 && i % 20 == 0) {
 			line.spriteX = -2.5;
@@ -185,7 +170,7 @@ function setup() {
 	}
 
 	// Temp to evaluate the behaviour ouf the sprites
-	imgTemp = createHiddenImage("img/7.png", lines[300]);
+	imgTemp = createHiddenImage("img/sprites/7.png", lines[300]);
 	lines[300].spriteX = -1.2
 
 	if (debug) {

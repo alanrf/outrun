@@ -14,3 +14,16 @@ function drawTextWithBorder(frontColor, backColor, message, x, y) {
 	drawText(backColor, message, x, y);
 	drawText(frontColor, message, x + 2, y + 2);
 }
+
+function createHiddenImage(path, lineNumber) {
+	var newImg = createImg(path);
+	//newImg.show();
+	// 	l.originalSpriteWidth=newImg.width;
+	// 	l.originalSpriteHeight=newImg.height;
+	lineNumber.originalSpriteWidth = 1024;
+	lineNumber.originalSpriteHeight = 372;
+
+	newImg.hide();
+	lineNumber.sprite = newImg;
+	return newImg;
+}
