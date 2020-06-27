@@ -25,10 +25,11 @@ Done:
 25/06/2020
 - Identação e melhorias de código para facilitar a leitura do mesmo
 
+26/06/202
+- Adicionar velocidade
 
 To do:
 ======
-- Adicionar velocidade
 - Corrigir apresentação de 'sprites' (arvores e outros) para deixar num tamanho melhor e
 	movimentando conforme se chega mais próximo.
 - Adicionar 3 faixas de rodagem na pista.
